@@ -1,0 +1,440 @@
+MariaDB [broy5db]> SELECT sip.PORT_ID,prt.TRADE_DATE,prt.SEC_ID,prt.CLOSE_PRICE*sip.NUM_SHARES AS HOLDING_VALUE
+    -> FROM PRICE_TABLE prt
+    -> INNER JOIN SEC_IN_PORT sip ON sip.SEC_ID=prt.SEC_ID AND sip.TRADE_DATE=prt.TRADE_DATE
+    -> ORDER BY 1,3,2;
++---------+------------+----------+-----------------+
+| PORT_ID | TRADE_DATE | SEC_ID   | HOLDING_VALUE   |
++---------+------------+----------+-----------------+
+|    9026 | 2022-10-01 | 40036408 |    8217478.8720 |
+|    9026 | 2022-10-02 | 40036408 |    9790016.2000 |
+|    9026 | 2022-10-03 | 40036408 |    9748095.5040 |
+|    9026 | 2022-10-04 | 40036408 |   10478129.0880 |
+|    9026 | 2022-10-05 | 40036408 |   12428975.1360 |
+|    9026 | 2022-10-06 | 40036408 |   11529213.8560 |
+|    9026 | 2022-10-07 | 40036408 |    9935204.9520 |
+|    9026 | 2022-10-08 | 40036408 |    8216456.4160 |
+|    9026 | 2022-10-09 | 40036408 |    8608057.0640 |
+|    9026 | 2022-10-10 | 40036408 |    9324798.7200 |
+|    9026 | 2022-10-11 | 40036408 |    8389251.4800 |
+|    9026 | 2022-10-12 | 40036408 |    9048735.6000 |
+|    9026 | 2022-10-13 | 40036408 |    8003785.5680 |
+..................................................... // Cut for ease of viewing
+|    9758 | 2022-10-19 | 49671156 |   44404531.2664 |
+|    9758 | 2022-10-20 | 49671156 |   44549381.1328 |
+|    9758 | 2022-10-21 | 49671156 |   43664187.5048 |
+|    9758 | 2022-10-22 | 49671156 |   43181354.6168 |
+|    9758 | 2022-10-23 | 49671156 |   41539722.7976 |
+|    9758 | 2022-10-24 | 49671156 |   41829422.5304 |
+|    9758 | 2022-10-25 | 49671156 |   42344444.2776 |
+|    9758 | 2022-10-26 | 49671156 |   42569766.2920 |
+|    9758 | 2022-10-27 | 49671156 |   48460327.5256 |
+|    9758 | 2022-10-28 | 49671156 |   53900244.7304 |
+|    9758 | 2022-10-29 | 49671156 |   49313332.2944 |
+|    9758 | 2022-10-30 | 49671156 |   59662050.5272 |
+|    9758 | 2022-10-31 | 49671156 |   60112694.5560 |
++---------+------------+----------+-----------------+
+8370 rows in set (0.212 sec)
+
+MariaDB [broy5db]> SELECT t.PORT_ID,t.PORT_LONG_NAME,t.TRADE_DATE, SUM(t.HOLDING_VALUE) AS Market_Value FROM (
+    -> SELECT sip.PORT_ID, pt.PORT_LONG_NAME,
+    -> prt.TRADE_DATE, prt.SEC_ID, prt.CLOSE_PRICE * sip.NUM_SHARES AS HOLDING_VALUE
+    -> FROM PRICE_TABLE prt
+    -> INNER JOIN SEC_IN_PORT sip ON sip.SEC_ID=prt.SEC_ID AND sip.TRADE_DATE = prt.TRADE_DATE
+    -> INNER JOIN PORT_TABLE pt ON pt.PORT_ID=sip.PORT_ID)
+    -> AS t
+    -> GROUP BY t.PORT_ID, t.TRADE_DATE
+    -> ORDER BY t.PORT_ID,t.TRADE_DATE;
++---------+----------------------------------------------------+------------+-----------------+
+| PORT_ID | PORT_LONG_NAME                                     | TRADE_DATE | Market_Value    |
++---------+----------------------------------------------------+------------+-----------------+
+|    9026 | Stay Puft, Inc - Emerging Market Equity            | 2022-10-01 |  714026806.8253 |
+...............................................................................................
+|    9026 | Stay Puft, Inc - Emerging Market Equity            | 2022-10-31 |  658647479.7250 |
+|    9067 | Ghost Corporation - US Equity                      | 2022-10-01 |  648992108.5701 |
+...............................................................................................
+|    9067 | Ghost Corporation - US Equity                      | 2022-10-31 |  863772498.0538 |
+|    9188 | Venkman Ventures - Midcap Equity                   | 2022-10-01 |  411994946.1287 |
+...............................................................................................
+|    9188 | Venkman Ventures - Midcap Equity                   | 2022-10-31 |  396326367.4908 |
+|    9270 | Stanz Raymond Investments - US Equity              | 2022-10-01 |   11999870.6188 |
+...............................................................................................
+|    9270 | Stanz Raymond Investments - US Equity              | 2022-10-31 |   13426695.1810 |
+|    9390 | Ghost Corporation - Midcap Equity                  | 2022-10-01 |   98998671.0784 |
+...............................................................................................
+|    9390 | Ghost Corporation - Midcap Equity                  | 2022-10-31 |   71620968.6229 |
+|    9400 | W.Y.G.C, Inc - Large Cap Equity                    | 2022-10-01 |  677967879.0854 |
+...............................................................................................
+|    9400 | W.Y.G.C, Inc - Large Cap Equity                    | 2022-10-31 |  899688397.5491 |
+|    9407 | Stay Puft, Inc - Canadian Equity                   | 2022-10-01 |  147004426.2637 |
+...............................................................................................
+|    9407 | Stay Puft, Inc - Canadian Equity                   | 2022-10-31 |  155039677.3533 |
+|    9621 | Zeddemore Consulting - Midcap Equity               | 2022-10-01 |  888989093.7715 |
+...............................................................................................
+|    9621 | Zeddemore Consulting - Midcap Equity               | 2022-10-31 |  855179951.4543 |
+|    9622 | Venkman Ventures - Canadian Equity                 | 2022-10-01 |  972896058.6160 |
+...............................................................................................
+|    9622 | Venkman Ventures - Canadian Equity                 | 2022-10-31 |  908578826.6120 |
+|    9640 | W.Y.G.C, Inc - US Equity                           | 2022-10-01 |  638980793.3730 |
+...............................................................................................
+|    9640 | W.Y.G.C, Inc - US Equity                           | 2022-10-31 |  762264901.3301 |
+|    9686 | Ghost Corporation - Emerging Market Equity         | 2022-10-01 |  372981965.1338 |
+...............................................................................................
+|    9686 | Ghost Corporation - Emerging Market Equity         | 2022-10-31 |  366397751.1832 |
+|    9692 | Stanz Raymond Investments - Emerging Market Equity | 2022-10-01 |   73008105.9549 |
+...............................................................................................
+|    9692 | Stanz Raymond Investments - Emerging Market Equity | 2022-10-31 |   62824437.9773 |
+|    9750 | Stay Puft, Inc - US Equity                         | 2022-10-01 |  473002434.1304 |
+...............................................................................................
+|    9750 | Stay Puft, Inc - US Equity                         | 2022-10-31 |  508084008.9174 |
+|    9758 | Zeddemore Consulting - Large Cap Equity            | 2022-10-01 |  741993880.5364 |
+...............................................................................................
+|    9758 | Zeddemore Consulting - Large Cap Equity            | 2022-10-31 |  864511338.7673 |
++---------+----------------------------------------------------+------------+-----------------+
+434 rows in set (0.204 sec)
+
+MariaDB [broy5db]> CREATE VIEW PORT_VALUES AS
+    -> (SELECT t.PORT_ID,t.PORT_LONG_NAME,t.TRADE_DATE, SUM(t.HOLDING_VALUE) AS Market_Value FROM (
+    -> SELECT sip.PORT_ID, pt.PORT_LONG_NAME,
+    -> prt.TRADE_DATE, prt.SEC_ID, prt.CLOSE_PRICE * sip.NUM_SHARES AS HOLDING_VALUE
+    -> FROM PRICE_TABLE prt
+    -> INNER JOIN SEC_IN_PORT sip ON sip.SEC_ID=prt.SEC_ID AND sip.TRADE_DATE = prt.TRADE_DATE
+    -> INNER JOIN PORT_TABLE pt ON pt.PORT_ID=sip.PORT_ID)
+    -> AS t
+    -> GROUP BY t.PORT_ID, t.TRADE_DATE
+    -> ORDER BY t.PORT_ID,t.TRADE_DATE);
+Query OK, 0 rows affected (0.002 sec)
+
+MariaDB [broy5db]> SELECT * FROM PORT_VALUES;
++---------+----------------------------------------------------+------------+-----------------+
+| PORT_ID | PORT_LONG_NAME                                     | TRADE_DATE | Market_Value    |
++---------+----------------------------------------------------+------------+-----------------+
+|    9026 | Stay Puft, Inc - Emerging Market Equity            | 2022-10-01 |  714026806.8253 |
+...............................................................................................
+|    9026 | Stay Puft, Inc - Emerging Market Equity            | 2022-10-31 |  658647479.7250 |
+|    9067 | Ghost Corporation - US Equity                      | 2022-10-01 |  648992108.5701 |
+...............................................................................................
+|    9067 | Ghost Corporation - US Equity                      | 2022-10-31 |  863772498.0538 |
+|    9188 | Venkman Ventures - Midcap Equity                   | 2022-10-01 |  411994946.1287 |
+...............................................................................................
+|    9188 | Venkman Ventures - Midcap Equity                   | 2022-10-31 |  396326367.4908 |
+|    9270 | Stanz Raymond Investments - US Equity              | 2022-10-01 |   11999870.6188 |
+...............................................................................................
+|    9270 | Stanz Raymond Investments - US Equity              | 2022-10-31 |   13426695.1810 |
+|    9390 | Ghost Corporation - Midcap Equity                  | 2022-10-01 |   98998671.0784 |
+...............................................................................................
+|    9390 | Ghost Corporation - Midcap Equity                  | 2022-10-31 |   71620968.6229 |
+|    9400 | W.Y.G.C, Inc - Large Cap Equity                    | 2022-10-01 |  677967879.0854 |
+...............................................................................................
+|    9400 | W.Y.G.C, Inc - Large Cap Equity                    | 2022-10-31 |  899688397.5491 |
+|    9407 | Stay Puft, Inc - Canadian Equity                   | 2022-10-01 |  147004426.2637 |
+...............................................................................................
+|    9407 | Stay Puft, Inc - Canadian Equity                   | 2022-10-31 |  155039677.3533 |
+|    9621 | Zeddemore Consulting - Midcap Equity               | 2022-10-01 |  888989093.7715 |
+...............................................................................................
+|    9621 | Zeddemore Consulting - Midcap Equity               | 2022-10-31 |  855179951.4543 |
+|    9622 | Venkman Ventures - Canadian Equity                 | 2022-10-01 |  972896058.6160 |
+...............................................................................................
+|    9622 | Venkman Ventures - Canadian Equity                 | 2022-10-31 |  908578826.6120 |
+|    9640 | W.Y.G.C, Inc - US Equity                           | 2022-10-01 |  638980793.3730 |
+...............................................................................................
+|    9640 | W.Y.G.C, Inc - US Equity                           | 2022-10-31 |  762264901.3301 |
+|    9686 | Ghost Corporation - Emerging Market Equity         | 2022-10-01 |  372981965.1338 |
+...............................................................................................
+|    9686 | Ghost Corporation - Emerging Market Equity         | 2022-10-31 |  366397751.1832 |
+|    9692 | Stanz Raymond Investments - Emerging Market Equity | 2022-10-01 |   73008105.9549 |
+...............................................................................................
+|    9692 | Stanz Raymond Investments - Emerging Market Equity | 2022-10-31 |   62824437.9773 |
+|    9750 | Stay Puft, Inc - US Equity                         | 2022-10-01 |  473002434.1304 |
+...............................................................................................
+|    9750 | Stay Puft, Inc - US Equity                         | 2022-10-31 |  508084008.9174 |
+|    9758 | Zeddemore Consulting - Large Cap Equity            | 2022-10-01 |  741993880.5364 |
+...............................................................................................
+|    9758 | Zeddemore Consulting - Large Cap Equity            | 2022-10-31 |  864511338.7673 |
++---------+----------------------------------------------------+------------+-----------------+
+434 rows in set (0.205 sec)
+
+MariaDB [broy5db]> CREATE VIEW PORT_START_END AS
+    ->     SELECT PORT_ID, PORT_LONG_NAME, MIN(TRADE_DATE) AS START_MONTH, MAX(TRADE_DATE) AS END_MONTH
+    ->         FROM PORT_VALUES GROUP BY PORT_ID, PORT_LONG_NAME;
+Query OK, 0 rows affected (0.002 sec)
+
+MariaDB [broy5db]> SELECT * FROM PORT_START_END;
++---------+----------------------------------------------------+-------------+------------+
+| PORT_ID | PORT_LONG_NAME                                     | START_MONTH | END_MONTH  |
++---------+----------------------------------------------------+-------------+------------+
+|    9026 | Stay Puft, Inc - Emerging Market Equity            | 2022-10-01  | 2022-10-31 |
+|    9067 | Ghost Corporation - US Equity                      | 2022-10-01  | 2022-10-31 |
+|    9188 | Venkman Ventures - Midcap Equity                   | 2022-10-01  | 2022-10-31 |
+|    9270 | Stanz Raymond Investments - US Equity              | 2022-10-01  | 2022-10-31 |
+|    9390 | Ghost Corporation - Midcap Equity                  | 2022-10-01  | 2022-10-31 |
+|    9400 | W.Y.G.C, Inc - Large Cap Equity                    | 2022-10-01  | 2022-10-31 |
+|    9407 | Stay Puft, Inc - Canadian Equity                   | 2022-10-01  | 2022-10-31 |
+|    9621 | Zeddemore Consulting - Midcap Equity               | 2022-10-01  | 2022-10-31 |
+|    9622 | Venkman Ventures - Canadian Equity                 | 2022-10-01  | 2022-10-31 |
+|    9640 | W.Y.G.C, Inc - US Equity                           | 2022-10-01  | 2022-10-31 |
+|    9686 | Ghost Corporation - Emerging Market Equity         | 2022-10-01  | 2022-10-31 |
+|    9692 | Stanz Raymond Investments - Emerging Market Equity | 2022-10-01  | 2022-10-31 |
+|    9750 | Stay Puft, Inc - US Equity                         | 2022-10-01  | 2022-10-31 |
+|    9758 | Zeddemore Consulting - Large Cap Equity            | 2022-10-01  | 2022-10-31 |
++---------+----------------------------------------------------+-------------+------------+
+14 rows in set (0.206 sec)
+
+MariaDB [broy5db]> SELECT RANK() OVER(ORDER BY M1_RETURN DESC) "Rank", port_open.PORT_ID, port_open.PORT_LONG_NAME,
+    -> port_open.MONTH_START, port_close.MONTH_END,port_open.MONTH_OPEN, port_close.MONTH_CLOSE,
+    ->     (port_close.MONTH_CLOSE/port_open.MONTH_OPEN-1)*100 AS M1_RETURN
+    -> FROM
+    ->     (SELECT pv.PORT_ID, pv.PORT_LONG_NAME, pv.TRADE_DATE as MONTH_START, pv.Market_Value AS MONTH_OPEN 
+    ->     FROM PORT_VALUES AS pv INNER JOIN PORT_START_END as ps1
+    -> ON pv.PORT_ID = ps1.PORT_ID AND pv.TRADE_DATE = ps1.START_MONTH) AS port_open
+    -> INNER JOIN 
+    ->     (SELECT pv.PORT_ID, pv.PORT_LONG_NAME, pv.TRADE_DATE as MONTH_END, pv.Market_Value AS MONTH_CLOSE
+    ->     FROM PORT_VALUES AS pv INNER JOIN PORT_START_END as ps1
+    -> ON pv.PORT_ID = ps1.PORT_ID AND pv.TRADE_DATE = ps1.END_MONTH) AS port_close
+    -> ON port_open.PORT_ID = port_close.PORT_ID
+    -> ORDER BY M1_RETURN DESC;
++------+---------+----------------------------------------------------+-------------+------------+----------------+----------------+--------------+
+| Rank | PORT_ID | PORT_LONG_NAME                                     | MONTH_START | MONTH_END  | MONTH_OPEN     | MONTH_CLOSE    | M1_RETURN    |
++------+---------+----------------------------------------------------+-------------+------------+----------------+----------------+--------------+
+|    1 |    9067 | Ghost Corporation - US Equity                      | 2022-10-01  | 2022-10-31 | 648992108.5701 | 863772498.0538 |  33.09445318 |
+|    2 |    9400 | W.Y.G.C, Inc - Large Cap Equity                    | 2022-10-01  | 2022-10-31 | 677967879.0854 | 899688397.5491 |  32.70369074 |
+|    3 |    9640 | W.Y.G.C, Inc - US Equity                           | 2022-10-01  | 2022-10-31 | 638980793.3730 | 762264901.3301 |  19.29386755 |
+|    4 |    9758 | Zeddemore Consulting - Large Cap Equity            | 2022-10-01  | 2022-10-31 | 741993880.5364 | 864511338.7673 |  16.51192300 |
+|    5 |    9270 | Stanz Raymond Investments - US Equity              | 2022-10-01  | 2022-10-31 |  11999870.6188 |  13426695.1810 |  11.89033288 |
+|    6 |    9750 | Stay Puft, Inc - US Equity                         | 2022-10-01  | 2022-10-31 | 473002434.1304 | 508084008.9174 |   7.41678525 |
+|    7 |    9407 | Stay Puft, Inc - Canadian Equity                   | 2022-10-01  | 2022-10-31 | 147004426.2637 | 155039677.3533 |   5.46599262 |
+|    8 |    9686 | Ghost Corporation - Emerging Market Equity         | 2022-10-01  | 2022-10-31 | 372981965.1338 | 366397751.1832 |  -1.76529017 |
+|    9 |    9188 | Venkman Ventures - Midcap Equity                   | 2022-10-01  | 2022-10-31 | 411994946.1287 | 396326367.4908 |  -3.80309972 |
+|   10 |    9621 | Zeddemore Consulting - Midcap Equity               | 2022-10-01  | 2022-10-31 | 888989093.7715 | 855179951.4543 |  -3.80309979 |
+|   11 |    9622 | Venkman Ventures - Canadian Equity                 | 2022-10-01  | 2022-10-31 | 972896058.6160 | 908578826.6120 |  -6.61090478 |
+|   12 |    9026 | Stay Puft, Inc - Emerging Market Equity            | 2022-10-01  | 2022-10-31 | 714026806.8253 | 658647479.7250 |  -7.75591708 |
+|   13 |    9692 | Stanz Raymond Investments - Emerging Market Equity | 2022-10-01  | 2022-10-31 |  73008105.9549 |  62824437.9773 | -13.94868124 |
+|   14 |    9390 | Ghost Corporation - Midcap Equity                  | 2022-10-01  | 2022-10-31 |  98998671.0784 |  71620968.6229 | -27.65461612 |
++------+---------+----------------------------------------------------+-------------+------------+----------------+----------------+--------------+
+14 rows in set (0.810 sec)
+
+MariaDB [broy5db]> CREATE VIEW WINNERS_LOSERS AS
+    -> (SELECT RANK() OVER(ORDER BY M1_RETURN DESC) "Rank", port_open.PORT_ID, port_open.PORT_LONG_NAME,
+    -> port_open.MONTH_START, port_close.MONTH_END,CONCAT('$', FORMAT(port_open.MONTH_OPEN, 2)) MONTH_OPEN,
+    ->    CONCAT('$', FORMAT(port_close.MONTH_CLOSE, 2)) MONTH_CLOSE,
+    ->    (port_close.MONTH_CLOSE/port_open.MONTH_OPEN-1)*100 AS M1_RETURN
+    -> FROM
+    ->     (SELECT pv.PORT_ID, pv.PORT_LONG_NAME, pv.TRADE_DATE as MONTH_START, pv.Market_Value AS MONTH_OPEN 
+    ->     FROM PORT_VALUES AS pv INNER JOIN PORT_START_END as ps1
+    ->         ON pv.PORT_ID = ps1.PORT_ID AND pv.TRADE_DATE = ps1.START_MONTH) AS port_open
+    -> INNER JOIN 
+    ->     (SELECT pv.PORT_ID, pv.PORT_LONG_NAME, pv.TRADE_DATE as MONTH_END, pv.Market_Value AS MONTH_CLOSE
+    ->     FROM PORT_VALUES AS pv INNER JOIN PORT_START_END as ps1
+    ->         ON pv.PORT_ID = ps1.PORT_ID AND pv.TRADE_DATE = ps1.END_MONTH) AS port_close
+    -> ON port_open.PORT_ID = port_close.PORT_ID
+    -> ORDER BY M1_RETURN DESC);
+Query OK, 0 rows affected (0.003 sec)
+
+MariaDB [broy5db]> SELECT * FROM WINNERS_LOSERS;
++------+---------+----------------------------------------------------+-------------+------------+-----------------+-----------------+--------------+
+| Rank | PORT_ID | PORT_LONG_NAME                                     | MONTH_START | MONTH_END  | MONTH_OPEN      | MONTH_CLOSE     | M1_RETURN    |
++------+---------+----------------------------------------------------+-------------+------------+-----------------+-----------------+--------------+
+|    1 |    9067 | Ghost Corporation - US Equity                      | 2022-10-01  | 2022-10-31 | $648,992,108.57 | $863,772,498.05 |  33.09445318 |
+|    2 |    9400 | W.Y.G.C, Inc - Large Cap Equity                    | 2022-10-01  | 2022-10-31 | $677,967,879.09 | $899,688,397.55 |  32.70369074 |
+|    3 |    9640 | W.Y.G.C, Inc - US Equity                           | 2022-10-01  | 2022-10-31 | $638,980,793.37 | $762,264,901.33 |  19.29386755 |
+|    4 |    9758 | Zeddemore Consulting - Large Cap Equity            | 2022-10-01  | 2022-10-31 | $741,993,880.54 | $864,511,338.77 |  16.51192300 |
+|    5 |    9270 | Stanz Raymond Investments - US Equity              | 2022-10-01  | 2022-10-31 | $11,999,870.62  | $13,426,695.18  |  11.89033288 |
+|    6 |    9750 | Stay Puft, Inc - US Equity                         | 2022-10-01  | 2022-10-31 | $473,002,434.13 | $508,084,008.92 |   7.41678525 |
+|    7 |    9407 | Stay Puft, Inc - Canadian Equity                   | 2022-10-01  | 2022-10-31 | $147,004,426.26 | $155,039,677.35 |   5.46599262 |
+|    8 |    9686 | Ghost Corporation - Emerging Market Equity         | 2022-10-01  | 2022-10-31 | $372,981,965.13 | $366,397,751.18 |  -1.76529017 |
+|    9 |    9188 | Venkman Ventures - Midcap Equity                   | 2022-10-01  | 2022-10-31 | $411,994,946.13 | $396,326,367.49 |  -3.80309972 |
+|   10 |    9621 | Zeddemore Consulting - Midcap Equity               | 2022-10-01  | 2022-10-31 | $888,989,093.77 | $855,179,951.45 |  -3.80309979 |
+|   11 |    9622 | Venkman Ventures - Canadian Equity                 | 2022-10-01  | 2022-10-31 | $972,896,058.62 | $908,578,826.61 |  -6.61090478 |
+|   12 |    9026 | Stay Puft, Inc - Emerging Market Equity            | 2022-10-01  | 2022-10-31 | $714,026,806.83 | $658,647,479.73 |  -7.75591708 |
+|   13 |    9692 | Stanz Raymond Investments - Emerging Market Equity | 2022-10-01  | 2022-10-31 | $73,008,105.95  | $62,824,437.98  | -13.94868124 |
+|   14 |    9390 | Ghost Corporation - Midcap Equity                  | 2022-10-01  | 2022-10-31 | $98,998,671.08  | $71,620,968.62  | -27.65461612 |
++------+---------+----------------------------------------------------+-------------+------------+-----------------+-----------------+--------------+
+14 rows in set (0.870 sec)
+
+MariaDB [broy5db]> SELECT RANK() OVER(ORDER BY wl.M1_RETURN DESC) "Rank", st.STRATEGY_LONG_NAME, wl.M1_RETURN
+    -> FROM STRAT_TABLE st
+    -> INNER JOIN PORT_TABLE pt ON pt.STRAT_ID=st.STRAT_ID
+    -> INNER JOIN WINNERS_LOSERS wl ON wl.PORT_ID=pt.PORT_ID
+    -> ORDER BY wl.M1_RETURN DESC;
++------+------------------------+--------------+
+| Rank | STRATEGY_LONG_NAME     | M1_RETURN    |
++------+------------------------+--------------+
+|    1 | US Equity              |  33.09445318 |
+|    2 | Large Cap Equity       |  32.70369074 |
+|    3 | US Equity              |  19.29386755 |
+|    4 | Large Cap Equity       |  16.51192300 |
+|    5 | US Equity              |  11.89033288 |
+|    6 | US Equity              |   7.41678525 |
+|    7 | Canadian Equity        |   5.46599262 |
+|    8 | Emerging Market Equity |  -1.76529017 |
+|    9 | Midcap Equity          |  -3.80309972 |
+|   10 | Midcap Equity          |  -3.80309979 |
+|   11 | Canadian Equity        |  -6.61090478 |
+|   12 | Emerging Market Equity |  -7.75591708 |
+|   13 | Emerging Market Equity | -13.94868124 |
+|   14 | Midcap Equity          | -27.65461612 |
++------+------------------------+--------------+
+14 rows in set (0.845 sec)
+
+MariaDB [broy5db]> SELECT RANK() OVER(ORDER BY M1_RETURN DESC) "Rank", pt.PORT_LONG_NAME, pt.LONG_SHORT, M1_RETURN
+    -> FROM WINNERS_LOSERS wl
+    -> INNER JOIN PORT_TABLE pt ON pt.PORT_ID=wl.PORT_ID;
++------+----------------------------------------------------+------------+--------------+
+| Rank | PORT_LONG_NAME                                     | LONG_SHORT | M1_RETURN    |
++------+----------------------------------------------------+------------+--------------+
+|    1 | Ghost Corporation - US Equity                      | Long Short |  33.09445318 |
+|    2 | W.Y.G.C, Inc - Large Cap Equity                    | Long Short |  32.70369074 |
+|    3 | W.Y.G.C, Inc - US Equity                           | Long Only  |  19.29386755 |
+|    4 | Zeddemore Consulting - Large Cap Equity            | Long Only  |  16.51192300 |
+|    5 | Stanz Raymond Investments - US Equity              | Long Only  |  11.89033288 |
+|    6 | Stay Puft, Inc - US Equity                         | Long Only  |   7.41678525 |
+|    7 | Stay Puft, Inc - Canadian Equity                   | Long Only  |   5.46599262 |
+|    8 | Ghost Corporation - Emerging Market Equity         | Long Only  |  -1.76529017 |
+|    9 | Venkman Ventures - Midcap Equity                   | Long Only  |  -3.80309972 |
+|   10 | Zeddemore Consulting - Midcap Equity               | Long Only  |  -3.80309979 |
+|   11 | Venkman Ventures - Canadian Equity                 | Long Short |  -6.61090478 |
+|   12 | Stay Puft, Inc - Emerging Market Equity            | Long Only  |  -7.75591708 |
+|   13 | Stanz Raymond Investments - Emerging Market Equity | Long Short | -13.94868124 |
+|   14 | Ghost Corporation - Midcap Equity                  | Long Short | -27.65461612 |
++------+----------------------------------------------------+------------+--------------+
+14 rows in set (0.885 sec)
+
+MariaDB [broy5db]> SELECT LONG_SHORT, CONCAT('$', FORMAT(START_MV, 2)) "Beginning MV"
+    -> FROM PORT_TABLE
+    -> WHERE LONG_SHORT='Long Only'
+    -> GROUP BY START_MV,LONG_SHORT
+    -> HAVING START_MV>100000000;
++------------+-----------------+
+| LONG_SHORT | Beginning MV    |
++------------+-----------------+
+| Long Only  | $147,000,000.00 |
+| Long Only  | $320,000,000.00 |
+| Long Only  | $412,000,000.00 |
+| Long Only  | $473,000,000.00 |
+| Long Only  | $639,000,000.00 |
+| Long Only  | $714,000,000.00 |
+| Long Only  | $742,000,000.00 |
+| Long Only  | $889,000,000.00 |
++------------+-----------------+
+8 rows in set (0.000 sec)
+
+MariaDB [broy5db]> SELECT CLIENT_LONG_NAME,ONBOARDING_DATE,TERMINATION_DATE,
+    -> CONCAT((DATEDIFF(CURRENT_DATE,ONBOARDING_DATE))/365," years") AS Duration
+    -> FROM CLIENT_TABLE
+    -> WHERE TERMINATION_DATE IS NULL
+    -> ORDER BY 2 DESC;
++---------------------------+-----------------+------------------+---------------+
+| CLIENT_LONG_NAME          | ONBOARDING_DATE | TERMINATION_DATE | Duration      |
++---------------------------+-----------------+------------------+---------------+
+| Stay Puft, Inc            | 2021-11-19      | NULL             | 1.0164 years  |
+| W.Y.G.C, Inc              | 2021-11-19      | NULL             | 1.0164 years  |
+| Ghost Corporation         | 2015-03-09      | NULL             | 7.7205 years  |
+| Venkman Ventures          | 1984-06-01      | NULL             | 38.5096 years |
+| Stanz Raymond Investments | 1984-06-01      | NULL             | 38.5096 years |
+| Zeddemore Consulting      | 1984-06-01      | NULL             | 38.5096 years |
++---------------------------+-----------------+------------------+---------------+
+6 rows in set (0.001 sec)
+
+MariaDB [broy5db]> SELECT CONCAT(FIRST_NAME,' ',LAST_NAME) "Portfolio Manager Name"
+    -> FROM PM_TABLE;
++------------------------+
+| Portfolio Manager Name |
++------------------------+
+| Johnny Makesalot       |
+| Barren Wuffet          |
+| Bertha Bucks           |
+| Teeter Peel            |
+| Beanjamin Slaham       |
++------------------------+
+5 rows in set (0.000 sec)
+
+MariaDB [broy5db]> SELECT * FROM STRAT_TABLE;
++----------+------------------------+------------+------------------------------------------------------------------------+
+| STRAT_ID | STRATEGY_LONG_NAME     | STRAT_BETA | DESCRIPTIONS                                                           |
++----------+------------------------+------------+------------------------------------------------------------------------+
+|      601 | US Equity              |       1.00 | ETFs and common shares of companies in the United States.              |
+|      602 | Emerging Market Equity |       1.70 | ETFs and common shares of companies in China, India, and South Africa. |
+|      603 | Canadian Equity        |       0.90 | ETFs and common shares of companies in Canada.                         |
+|      604 | Large Cap Equity       |       1.02 | ETFs and common shares of large cap companies.                         |
+|      605 | Midcap Equity          |       1.20 | ETFs and common shares of mid cap companies.                           |
++----------+------------------------+------------+------------------------------------------------------------------------+
+5 rows in set (0.000 sec)
+
+MariaDB [broy5db]> UPDATE STRAT_TABLE
+    -> SET descriptions='ETFs and common shares of companies in the United States market.'
+    -> WHERE STRAT_ID=601;
+Query OK, 1 row affected (0.002 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+MariaDB [broy5db]> UPDATE STRAT_TABLE
+    -> SET descriptions='ETFs and common shares of companies in the Canadian market.'
+    -> WHERE STRAT_ID=603;
+Query OK, 1 row affected (0.001 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+MariaDB [broy5db]> SELECT * FROM STRAT_TABLE;
++----------+------------------------+------------+------------------------------------------------------------------------+
+| STRAT_ID | STRATEGY_LONG_NAME     | STRAT_BETA | DESCRIPTIONS                                                           |
++----------+------------------------+------------+------------------------------------------------------------------------+
+|      601 | US Equity              |       1.00 | ETFs and common shares of companies in the United States market.       |
+|      602 | Emerging Market Equity |       1.70 | ETFs and common shares of companies in China, India, and South Africa. |
+|      603 | Canadian Equity        |       0.90 | ETFs and common shares of companies in the Canadian market.            |
+|      604 | Large Cap Equity       |       1.02 | ETFs and common shares of large cap companies.                         |
+|      605 | Midcap Equity          |       1.20 | ETFs and common shares of mid cap companies.                           |
++----------+------------------------+------------+------------------------------------------------------------------------+
+5 rows in set (0.000 sec)
+
+MariaDB [broy5db]> INSERT INTO STRAT_TABLE VALUES
+    -> (606,'Cash Management',0.1,'Cash securities of durration no longer than 90 days.'),
+    -> (607,'Mortgage-Backed Security',0.7,'Fixed income instruments backed by mortgages.');
+Query OK, 2 rows affected (0.002 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+MariaDB [broy5db]> SELECT * FROM STRAT_TABLE;
++----------+--------------------------+------------+------------------------------------------------------------------------+
+| STRAT_ID | STRATEGY_LONG_NAME       | STRAT_BETA | DESCRIPTIONS                                                           |
++----------+--------------------------+------------+------------------------------------------------------------------------+
+|      601 | US Equity                |       1.00 | ETFs and common shares of companies in the United States market.       |
+|      602 | Emerging Market Equity   |       1.70 | ETFs and common shares of companies in China, India, and South Africa. |
+|      603 | Canadian Equity          |       0.90 | ETFs and common shares of companies in the Canadian market.            |
+|      604 | Large Cap Equity         |       1.02 | ETFs and common shares of large cap companies.                         |
+|      605 | Midcap Equity            |       1.20 | ETFs and common shares of mid cap companies.                           |
+|      606 | Cash Management          |       0.10 | Cash securities of durration no longer than 90 days.                   |
+|      607 | Mortgage-Backed Security |       0.70 | Fixed income instruments backed by mortgages.                          |
++----------+--------------------------+------------+------------------------------------------------------------------------+
+7 rows in set (0.000 sec)
+
+MariaDB [broy5db]> DELETE FROM STRAT_TABLE
+    -> WHERE STRAT_ID IN (606,607);
+Query OK, 2 rows affected (0.002 sec)
+
+MariaDB [broy5db]> SELECT * FROM STRAT_TABLE;
++----------+------------------------+------------+------------------------------------------------------------------------+
+| STRAT_ID | STRATEGY_LONG_NAME     | STRAT_BETA | DESCRIPTIONS                                                           |
++----------+------------------------+------------+------------------------------------------------------------------------+
+|      601 | US Equity              |       1.00 | ETFs and common shares of companies in the United States market.       |
+|      602 | Emerging Market Equity |       1.70 | ETFs and common shares of companies in China, India, and South Africa. |
+|      603 | Canadian Equity        |       0.90 | ETFs and common shares of companies in the Canadian market.            |
+|      604 | Large Cap Equity       |       1.02 | ETFs and common shares of large cap companies.                         |
+|      605 | Midcap Equity          |       1.20 | ETFs and common shares of mid cap companies.                           |
++----------+------------------------+------------+------------------------------------------------------------------------+
+5 rows in set (0.000 sec)
+
+MariaDB [broy5db]> ALTER TABLE SEC_INFO
+    -> MODIFY SECURITY_LONG_NAME VARCHAR(100);
+Query OK, 0 rows affected (0.003 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [broy5db]> desc SEC_INFO;
++--------------------+--------------+------+-----+---------+-------+
+| Field              | Type         | Null | Key | Default | Extra |
++--------------------+--------------+------+-----+---------+-------+
+| SEC_ID             | decimal(8,0) | NO   | PRI | NULL    |       |
+| TICKER             | varchar(4)   | NO   |     | NULL    |       |
+| SECURITY_LONG_NAME | varchar(100) | YES  |     | NULL    |       |
+| SECURITY_TYPE      | varchar(5)   | NO   |     | NULL    |       |
+| STRATEGY_TYPE      | varchar(35)  | NO   |     | NULL    |       |
+| BASE_CURRENCY      | varchar(3)   | NO   |     | NULL    |       |
++--------------------+--------------+------+-----+---------+-------+
+6 rows in set (0.004 sec)
+
+MariaDB [broy5db]> notee
